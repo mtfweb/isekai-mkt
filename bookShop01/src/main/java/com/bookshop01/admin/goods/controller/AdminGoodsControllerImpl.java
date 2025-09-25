@@ -1,7 +1,7 @@
 package com.bookshop01.admin.goods.controller;
 
 import java.io.File;
-import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +33,7 @@ import com.bookshop01.member.vo.MemberVO;
 @RequestMapping(value="/admin/goods")
 public class AdminGoodsControllerImpl extends BaseController  implements AdminGoodsController{
 	private static final String CURR_IMAGE_REPO_PATH = "C:\\shopping\\file_repo";
+	
 	@Autowired
 	private AdminGoodsService adminGoodsService;
 	
@@ -42,8 +43,7 @@ public class AdminGoodsControllerImpl extends BaseController  implements AdminGo
 		String viewName=(String)request.getAttribute("viewName");
 		ModelAndView mav = new ModelAndView(viewName);
 		HttpSession session=request.getSession();
-		session=request.getSession();
-		session.setAttribute("side_menu", "admin_mode"); //∏∂¿Ã∆‰¿Ã¡ˆ ªÁ¿ÃµÂ ∏ﬁ¥∫∑Œ º≥¡§«—¥Ÿ.
+		session.setAttribute("side_menu", "admin_mode"); //ÎßàÏù¥ÌéòÏù¥ÏßÄ ÏÇ¨Ïù¥Îìú Î©îÎâ¥Î°ú ÏÑ§Ï†ï
 		
 		String fixedSearchPeriod = dateMap.get("fixedSearchPeriod");
 		String section = dateMap.get("section");
@@ -57,16 +57,13 @@ public class AdminGoodsControllerImpl extends BaseController  implements AdminGo
 		dateMap.put("endDate", endDate);
 		
 		Map<String,Object> condMap=new HashMap<String,Object>();
-		if(section== null) {
-			section = "1";
-		}
+		if(section== null) section = "1";
 		condMap.put("section",section);
-		if(pageNum== null) {
-			pageNum = "1";
-		}
+		if(pageNum== null) pageNum = "1";
 		condMap.put("pageNum",pageNum);
 		condMap.put("beginDate",beginDate);
 		condMap.put("endDate", endDate);
+		
 		List<GoodsVO> newGoodsList=adminGoodsService.listNewGoods(condMap);
 		mav.addObject("newGoodsList", newGoodsList);
 		
@@ -82,11 +79,9 @@ public class AdminGoodsControllerImpl extends BaseController  implements AdminGo
 		mav.addObject("section", section);
 		mav.addObject("pageNum", pageNum);
 		return mav;
-		
 	}
 	
 
-	
 	@RequestMapping(value="/addNewGoods.do" ,method={RequestMethod.POST})
 	public ResponseEntity addNewGoods(MultipartHttpServletRequest multipartRequest, HttpServletResponse response)  throws Exception {
 		multipartRequest.setCharacterEncoding("utf-8");
@@ -101,13 +96,20 @@ public class AdminGoodsControllerImpl extends BaseController  implements AdminGo
 			newGoodsMap.put(name,value);
 		}
 		
+		// ‚úÖ Î°úÍ∑∏Ïù∏ ÏÑ∏ÏÖò Ï≤¥ÌÅ¨
 		HttpSession session = multipartRequest.getSession();
 		MemberVO memberVO = (MemberVO) session.getAttribute("memberInfo");
-		String reg_id = memberVO.getMember_id();
+		String reg_id = "admin";  // Í∏∞Î≥∏Í∞í
+		if (memberVO != null) {
+			reg_id = memberVO.getMember_id();
+		}
 		
-		
-		List<ImageFileVO> imageFileList =upload(multipartRequest);
-		if(imageFileList!= null && imageFileList.size()!=0) {
+		// ‚úÖ Ïù¥ÎØ∏ÏßÄ ÏóÖÎ°úÎìú Ï≤òÎ¶¨ (null Î∞©Ïñ¥)
+		List<ImageFileVO> imageFileList = upload(multipartRequest);
+		if(imageFileList == null) {
+			imageFileList = new ArrayList<>();
+		}
+		if(!imageFileList.isEmpty()) {
 			for(ImageFileVO imageFileVO : imageFileList) {
 				imageFileVO.setReg_id(reg_id);
 			}
@@ -118,31 +120,34 @@ public class AdminGoodsControllerImpl extends BaseController  implements AdminGo
 		ResponseEntity resEntity = null;
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.add("Content-Type", "text/html; charset=utf-8");
+		
 		try {
 			int goods_id = adminGoodsService.addNewGoods(newGoodsMap);
-			if(imageFileList!=null && imageFileList.size()!=0) {
+			
+			// ‚úÖ ÏóÖÎ°úÎìúÌïú ÌååÏùº Ïù¥Îèô
+			if(!imageFileList.isEmpty()) {
 				for(ImageFileVO  imageFileVO:imageFileList) {
 					imageFileName = imageFileVO.getFileName();
-					File srcFile = new File(CURR_IMAGE_REPO_PATH+"\\"+"temp"+"\\"+imageFileName);
-					File destDir = new File(CURR_IMAGE_REPO_PATH+"\\"+goods_id);
+					File srcFile = new File(CURR_IMAGE_REPO_PATH + "\\temp\\" + imageFileName);
+					File destDir = new File(CURR_IMAGE_REPO_PATH + "\\" + goods_id);
 					FileUtils.moveFileToDirectory(srcFile, destDir,true);
 				}
 			}
 			message= "<script>";
-			message += " alert('ªıªÛ«∞¿ª √ﬂ∞°«ﬂΩ¿¥œ¥Ÿ.');";
+			message += " alert('ÏÉàÏÉÅÌíàÏùÑ Ï∂îÍ∞ÄÌñàÏäµÎãàÎã§.');";
 			message +=" location.href='"+multipartRequest.getContextPath()+"/admin/goods/addNewGoodsForm.do';";
 			message +=("</script>");
 		}catch(Exception e) {
-			if(imageFileList!=null && imageFileList.size()!=0) {
+			// Ïò§Î•ò Î∞úÏÉù Ïãú ÏûÑÏãú ÌååÏùº ÏÇ≠Ï†ú
+			if(!imageFileList.isEmpty()) {
 				for(ImageFileVO  imageFileVO:imageFileList) {
 					imageFileName = imageFileVO.getFileName();
-					File srcFile = new File(CURR_IMAGE_REPO_PATH+"\\"+"temp"+"\\"+imageFileName);
+					File srcFile = new File(CURR_IMAGE_REPO_PATH + "\\temp\\" + imageFileName);
 					srcFile.delete();
 				}
 			}
-			
 			message= "<script>";
-			message += " alert('ø¿∑˘∞° πﬂª˝«ﬂΩ¿¥œ¥Ÿ. ¥ŸΩ√ Ω√µµ«ÿ ¡÷ººø‰');";
+			message += " alert('Ïò§Î•òÍ∞Ä Î∞úÏÉùÌñàÏäµÎãàÎã§. Îã§Ïãú ÏãúÎèÑÌï¥ Ï£ºÏÑ∏Ïöî');";
 			message +=" location.href='"+multipartRequest.getContextPath()+"/admin/goods/addNewGoodsForm.do';";
 			message +=("</script>");
 			e.printStackTrace();
@@ -150,6 +155,7 @@ public class AdminGoodsControllerImpl extends BaseController  implements AdminGo
 		resEntity =new ResponseEntity(message, responseHeaders, HttpStatus.OK);
 		return resEntity;
 	}
+	
 	
 	@RequestMapping(value="/modifyGoodsForm.do" ,method={RequestMethod.GET,RequestMethod.POST})
 	public ModelAndView modifyGoodsForm(@RequestParam("goods_id") int goods_id,
@@ -168,7 +174,6 @@ public class AdminGoodsControllerImpl extends BaseController  implements AdminGo
 			                     @RequestParam("attribute") String attribute,
 			                     @RequestParam("value") String value,
 			HttpServletRequest request, HttpServletResponse response)  throws Exception {
-		//System.out.println("modifyGoodsInfo");
 		
 		Map<String,String> goodsMap=new HashMap<String,String>();
 		goodsMap.put("goods_id", goods_id);
@@ -201,14 +206,14 @@ public class AdminGoodsControllerImpl extends BaseController  implements AdminGo
 		
 		HttpSession session = multipartRequest.getSession();
 		MemberVO memberVO = (MemberVO) session.getAttribute("memberInfo");
-		String reg_id = memberVO.getMember_id();
+		String reg_id = (memberVO != null) ? memberVO.getMember_id() : "admin";
 		
 		List<ImageFileVO> imageFileList=null;
 		int goods_id=0;
 		int image_id=0;
 		try {
-			imageFileList =upload(multipartRequest);
-			if(imageFileList!= null && imageFileList.size()!=0) {
+			imageFileList = upload(multipartRequest);
+			if(imageFileList!= null && !imageFileList.isEmpty()) {
 				for(ImageFileVO imageFileVO : imageFileList) {
 					goods_id = Integer.parseInt((String)goodsMap.get("goods_id"));
 					image_id = Integer.parseInt((String)goodsMap.get("image_id"));
@@ -220,22 +225,21 @@ public class AdminGoodsControllerImpl extends BaseController  implements AdminGo
 			    adminGoodsService.modifyGoodsImage(imageFileList);
 				for(ImageFileVO  imageFileVO:imageFileList) {
 					imageFileName = imageFileVO.getFileName();
-					File srcFile = new File(CURR_IMAGE_REPO_PATH+"\\"+"temp"+"\\"+imageFileName);
+					File srcFile = new File(CURR_IMAGE_REPO_PATH+"\\temp\\"+imageFileName);
 					File destDir = new File(CURR_IMAGE_REPO_PATH+"\\"+goods_id);
 					FileUtils.moveFileToDirectory(srcFile, destDir,true);
 				}
 			}
 		}catch(Exception e) {
-			if(imageFileList!=null && imageFileList.size()!=0) {
+			if(imageFileList!=null && !imageFileList.isEmpty()) {
 				for(ImageFileVO  imageFileVO:imageFileList) {
 					imageFileName = imageFileVO.getFileName();
-					File srcFile = new File(CURR_IMAGE_REPO_PATH+"\\"+"temp"+"\\"+imageFileName);
+					File srcFile = new File(CURR_IMAGE_REPO_PATH+"\\temp\\"+imageFileName);
 					srcFile.delete();
 				}
 			}
 			e.printStackTrace();
 		}
-		
 	}
 	
 
@@ -258,13 +262,13 @@ public class AdminGoodsControllerImpl extends BaseController  implements AdminGo
 		
 		HttpSession session = multipartRequest.getSession();
 		MemberVO memberVO = (MemberVO) session.getAttribute("memberInfo");
-		String reg_id = memberVO.getMember_id();
+		String reg_id = (memberVO != null) ? memberVO.getMember_id() : "admin";
 		
 		List<ImageFileVO> imageFileList=null;
 		int goods_id=0;
 		try {
-			imageFileList =upload(multipartRequest);
-			if(imageFileList!= null && imageFileList.size()!=0) {
+			imageFileList = upload(multipartRequest);
+			if(imageFileList!= null && !imageFileList.isEmpty()) {
 				for(ImageFileVO imageFileVO : imageFileList) {
 					goods_id = Integer.parseInt((String)goodsMap.get("goods_id"));
 					imageFileVO.setGoods_id(goods_id);
@@ -274,16 +278,16 @@ public class AdminGoodsControllerImpl extends BaseController  implements AdminGo
 			    adminGoodsService.addNewGoodsImage(imageFileList);
 				for(ImageFileVO  imageFileVO:imageFileList) {
 					imageFileName = imageFileVO.getFileName();
-					File srcFile = new File(CURR_IMAGE_REPO_PATH+"\\"+"temp"+"\\"+imageFileName);
+					File srcFile = new File(CURR_IMAGE_REPO_PATH+"\\temp\\"+imageFileName);
 					File destDir = new File(CURR_IMAGE_REPO_PATH+"\\"+goods_id);
 					FileUtils.moveFileToDirectory(srcFile, destDir,true);
 				}
 			}
 		}catch(Exception e) {
-			if(imageFileList!=null && imageFileList.size()!=0) {
+			if(imageFileList!=null && !imageFileList.isEmpty()) {
 				for(ImageFileVO  imageFileVO:imageFileList) {
 					imageFileName = imageFileVO.getFileName();
-					File srcFile = new File(CURR_IMAGE_REPO_PATH+"\\"+"temp"+"\\"+imageFileName);
+					File srcFile = new File(CURR_IMAGE_REPO_PATH+"\\temp\\"+imageFileName);
 					srcFile.delete();
 				}
 			}

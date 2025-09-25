@@ -1,9 +1,3 @@
--- DB 생성
-CREATE DATABASE IF NOT EXISTS bookshop01
-  DEFAULT CHARACTER SET utf8mb4
-  COLLATE utf8mb4_0900_ai_ci;
-
-USE bookshop01;
 
 -- ======================
 -- 회원 테이블
@@ -103,3 +97,15 @@ INSERT INTO t_shopping_order (member_id, goods_id, order_qty, order_price)
 VALUES
 ('user1', 1, 2, 3600),
 ('user1', 2, 1, 27000);
+
+ALTER TABLE t_goods_detail_image 
+ADD COLUMN fileType VARCHAR(20) NULL COMMENT '파일 타입';
+ALTER TABLE t_goods_detail_image 
+ADD COLUMN reg_id VARCHAR(50) NULL COMMENT '등록자 ID';
+ALTER TABLE t_goods_detail_image
+ADD COLUMN credate DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '등록일';
+ALTER TABLE t_shopping_goods 
+ADD COLUMN goods_fileName VARCHAR(255) NULL COMMENT '대표 이미지 파일명';
+ALTER TABLE t_shopping_goods ADD COLUMN goods_point INT NULL COMMENT '상품 포인트';
+
+
