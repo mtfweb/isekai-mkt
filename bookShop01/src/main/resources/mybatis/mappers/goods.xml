@@ -1,115 +1,65 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="mapper.goods">
 
-  <!-- 카테고리별 상품 조회 -->
-  <select id="selectGoodsListByStatus" parameterType="string" resultType="com.bookshop01.goods.vo.GoodsVO">
-    SELECT g.goods_id,
-           g.goods_sort,
-           g.goods_title,
-           g.goods_price,
-           g.goods_sales_price,
-           g.goods_status,
-           g.goods_intro,
-           g.goods_credate,
-           g.main_image AS goods_fileName
+  <!-- 상품 ResultMap -->
+  <resultMap id="goodsResult" type="goodsVO">
+    <result property="goods_id" column="goods_id" />
+    <result property="goods_title" column="goods_title" />
+    <result property="goods_price" column="goods_price" />
+    <result property="goods_sales_price" column="goods_sales_price" />
+    <result property="goods_status" column="goods_status" />
+    <result property="goods_fileName" column="fileName" />
+    <result property="goods_sort" column="goods_sort" />
+    <result property="goods_intro" column="goods_intro" />
+    <result property="goods_contents_order" column="goods_contents_order" 
+            javaType="java.lang.String" jdbcType="CLOB" />
+  </resultMap>
+
+  <!-- 이미지 ResultMap -->
+  <resultMap id="imageResult" type="ImageFileVO">
+    <result property="goods_id" column="goods_id" />
+    <result property="fileName" column="fileName" />
+    <result property="reg_id" column="reg_id" />
+    <result property="image_id" column="image_id" />
+    <result property="fileType" column="fileType" />
+  </resultMap>
+
+  <!-- 상태별 상품 조회 -->
+  <select id="selectGoodsListByStatus" resultMap="goodsResult" parameterType="String">
+    SELECT 
+      g.goods_id,
+      g.goods_title,
+      g.goods_sales_price,
+      g.goods_status,
+      d.fileName
     FROM t_shopping_goods g
+    LEFT JOIN t_goods_detail_image d
+      ON g.goods_id = d.goods_id
+     AND d.fileType = 'main_image'
     WHERE g.goods_status = #{goods_status}
     ORDER BY g.goods_id DESC
   </select>
 
-  <!-- 상품 상세 -->
-  <select id="selectGoodsDetail" parameterType="string" resultType="com.bookshop01.goods.vo.GoodsVO">
-    SELECT g.goods_id,
-           g.goods_sort,
-           g.goods_title,
-           g.goods_price,
-           g.goods_sales_price,
-           g.goods_status,
-           g.goods_intro,
-           g.goods_credate,
-           g.main_image AS goods_fileName
+  <!-- 상품 상세 조회 -->
+  <select id="selectGoodsDetail" resultMap="goodsResult" parameterType="String">
+    SELECT g.*, d.fileName
     FROM t_shopping_goods g
+    LEFT JOIN t_goods_detail_image d
+      ON g.goods_id = d.goods_id
+     AND d.fileType = 'main_image'
     WHERE g.goods_id = #{goods_id}
   </select>
 
-  <!-- 상품 상세 이미지 리스트 -->
-  <select id="selectGoodsDetailImage" parameterType="string" resultType="com.bookshop01.goods.vo.ImageFileVO">
-    SELECT image_id,
-           goods_id,
-           fileName,
-           fileType,
-           reg_id,
-           credate
+  <!-- 상품 이미지 리스트 -->
+  <select id="selectGoodsImageFileList" resultMap="imageResult" parameterType="String">
+    SELECT * 
     FROM t_goods_detail_image
     WHERE goods_id = #{goods_id}
     ORDER BY image_id ASC
   </select>
-
-  <!-- 검색 -->
-  <select id="selectGoodsBySearchWord" parameterType="string" resultType="com.bookshop01.goods.vo.GoodsVO">
-    SELECT g.goods_id,
-           g.goods_sort,
-           g.goods_title,
-           g.goods_price,
-           g.goods_sales_price,
-           g.goods_status,
-           g.goods_intro,
-           g.goods_credate,
-           g.main_image AS goods_fileName
-    FROM t_shopping_goods g
-    WHERE g.goods_title LIKE CONCAT('%', #{searchWord}, '%')
-    ORDER BY g.goods_id DESC
-  </select>
-
-  <!-- 키워드 자동완성 -->
-  <select id="selectKeywordSearch" parameterType="string" resultType="string">
-    SELECT DISTINCT goods_title
-    FROM t_shopping_goods
-    WHERE goods_title LIKE CONCAT('%', #{keyword}, '%')
-    ORDER BY goods_title ASC
-    LIMIT 10
-  </select>
-
-  <!-- 새 상품 등록 -->
-  <insert id="insertNewGoods" parameterType="com.bookshop01.goods.vo.GoodsVO" useGeneratedKeys="true" keyProperty="goods_id">
-    INSERT INTO t_shopping_goods
-      (goods_sort,
-       goods_title,
-       goods_price,
-       goods_sales_price,
-       goods_intro,
-       goods_status,
-       main_image,
-       goods_credate)
-    VALUES
-      (#{goods_sort},
-       #{goods_title},
-       #{goods_price},
-       #{goods_sales_price},
-       #{goods_intro},
-       #{goods_status},
-       #{main_image},
-       NOW())
-  </insert>
-
-  <!-- 상품 이미지 등록 -->
-  <insert id="insertGoodsImage" parameterType="com.bookshop01.goods.vo.ImageFileVO">
-    INSERT INTO t_goods_detail_image
-      (goods_id,
-       fileName,
-       fileType,
-       reg_id,
-       credate)
-    VALUES
-      (#{goods_id},
-       #{fileName},
-       #{fileType},
-       #{reg_id},
-       NOW())
-  </insert>
 
 </mapper>

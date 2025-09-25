@@ -5,22 +5,24 @@
 
 <mapper namespace="mapper.admin.goods">
 
-  <!-- 리절트 맵 정의 -->
+  <!-- 상품 ResultMap -->
   <resultMap id="goodsResult" type="goodsVO">
     <result property="goods_id" column="goods_id" />
     <result property="goods_title" column="goods_title" />
     <result property="goods_price" column="goods_price" />
     <result property="goods_status" column="goods_status" />
     <result property="goods_sales_price" column="goods_sales_price" />
-    <result property="goods_published_date" column="goods_published_date" />
+    <result property="goods_point" column="goods_point" />
     <result property="goods_delivery_price" column="goods_delivery_price" />
     <result property="goods_delivery_date" column="goods_delivery_date" />
     <result property="goods_fileName" column="fileName" />
     <result property="goods_sort" column="goods_sort" />
     <result property="goods_intro" column="goods_intro" />
-    <result property="goods_contents_order" column="goods_contents_order" javaType="java.lang.String" jdbcType="CLOB" />
+    <result property="goods_contents_order" column="goods_contents_order"
+            javaType="java.lang.String" jdbcType="CLOB" />
   </resultMap>
 
+  <!-- 이미지 ResultMap (추가됨) -->
   <resultMap id="imageResult" type="ImageFileVO">
     <result property="goods_id" column="goods_id" />
     <result property="fileName" column="fileName" />
@@ -29,6 +31,7 @@
     <result property="fileType" column="fileType" />
   </resultMap>
 
+  <!-- 주문 ResultMap -->
   <resultMap id="orderGoodsResult" type="OrderVO">
     <result property="order_id" column="order_id" />
     <result property="member_id" column="member_id" />
@@ -60,7 +63,7 @@
     <result property="goods_fileName" column="goods_fileName" />
   </resultMap>
 
-  <!-- insertNewGoods (책 관련 필드 제거 버전) -->
+  <!-- 상품 등록 -->
   <insert id="insertNewGoods" parameterType="java.util.Map">
     <![CDATA[
       insert into t_shopping_goods(
@@ -69,7 +72,6 @@
         goods_price,
         goods_sales_price,
         goods_point,
-        goods_published_date,
         goods_delivery_price,
         goods_delivery_date,
         goods_status,
@@ -81,7 +83,6 @@
         #{goods_price},
         #{goods_sales_price},
         #{goods_point},
-        #{goods_published_date},
         #{goods_delivery_price},
         #{goods_delivery_date},
         #{goods_status},
@@ -91,6 +92,7 @@
     ]]>
   </insert>
 
+  <!-- 상품 이미지 등록 -->
   <insert id="insertGoodsImageFile" parameterType="imageFileVO">
     <![CDATA[
       insert into t_goods_detail_image (
@@ -107,6 +109,7 @@
     ]]>
   </insert>
 
+  <!-- 최근 등록 상품 조회 -->
   <select id="selectNewGoodsList" resultMap="goodsResult" parameterType="java.util.Map">
     <![CDATA[
       SELECT goods_id,
@@ -120,6 +123,7 @@
     ]]>
   </select>
 
+  <!-- 주문 상품 조회 -->
   <select id="selectOrderGoodsList" resultMap="orderGoodsResult" parameterType="java.util.Map">
     SELECT *
     FROM (
@@ -142,6 +146,7 @@
                     AND (#{section}-1)*100 + #{pageNum}*10
   </select>
 
+  <!-- 상품 상세 -->
   <select id="selectGoodsDetail" resultMap="goodsResult" parameterType="String">
     <![CDATA[
       select g.*, d.fileName
@@ -153,6 +158,7 @@
     ]]>
   </select>
 
+  <!-- 상품 이미지 리스트 -->
   <select id="selectGoodsImageFileList" resultMap="imageResult" parameterType="String">
     <![CDATA[
       select * from t_goods_detail_image
@@ -161,13 +167,13 @@
     ]]>
   </select>
 
+  <!-- 상품 정보 수정 -->
   <update id="updateGoodsInfo" parameterType="java.util.HashMap">
     update t_shopping_goods
     <set>
       <if test="goods_sort != null and goods_sort != ''">goods_sort=#{goods_sort},</if>
       <if test="goods_title != null and goods_title != ''">goods_title=#{goods_title},</if>
       <if test="goods_price != null and goods_price != ''">goods_price=#{goods_price},</if>
-      <if test="goods_published_date != null and goods_published_date != ''">goods_published_date=#{goods_published_date},</if>
       <if test="goods_sales_price != null and goods_sales_price != ''">goods_sales_price=#{goods_sales_price},</if>
       <if test="goods_point != null and goods_point != ''">goods_point=#{goods_point},</if>
       <if test="goods_delivery_price != null and goods_delivery_price != ''">goods_delivery_price=#{goods_delivery_price},</if>
@@ -179,17 +185,20 @@
     where goods_id=#{goods_id}
   </update>
 
+  <!-- 상품 이미지 수정 -->
   <update id="updateGoodsImage" parameterType="imageFileVO">
     update t_goods_detail_image
     set fileName=#{fileName}
     where goods_id=#{goods_id} and image_id=#{image_id}
   </update>
 
+  <!-- 상품 이미지 삭제 -->
   <delete id="deleteGoodsImage" parameterType="String">
     delete from t_goods_detail_image
     where image_id=#{image_id}
   </delete>
 
+  <!-- 주문 수정 -->
   <update id="updateOrderGoods" parameterType="java.util.HashMap">
     update t_shopping_order
     <set>
