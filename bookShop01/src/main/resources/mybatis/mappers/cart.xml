@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.cart">
+
+  <!-- 장바구니 목록 조회 -->
+  <select id="selectCartListByMemberId" parameterType="string" resultType="com.bookshop01.cart.vo.CartVO">
+    SELECT 
+      cart_id,
+      member_id,
+      goods_id,
+      cart_goods_qty,
+      credate,
+      del_yn
+    FROM t_shopping_cart
+    WHERE member_id = #{member_id}
+      AND del_yn = 'N'
+    ORDER BY cart_id DESC
+  </select>
+
+  <!-- 장바구니 상품 추가 -->
+  <insert id="insertCart" parameterType="com.bookshop01.cart.vo.CartVO">
+    INSERT INTO t_shopping_cart
+      (member_id, goods_id, cart_goods_qty, credate, del_yn)
+    VALUES
+      (#{member_id}, #{goods_id}, #{cart_goods_qty}, NOW(), 'N')
+  </insert>
+
+  <!-- 장바구니 수량 수정 -->
+  <update id="updateCartQty" parameterType="com.bookshop01.cart.vo.CartVO">
+    UPDATE t_shopping_cart
+    SET cart_goods_qty = #{cart_goods_qty}
+    WHERE goods_id = #{goods_id}
+      AND member_id = #{member_id}
+      AND del_yn = 'N'
+  </update>
+
+  <!-- 장바구니 상품 삭제 (논리 삭제) -->
+  <update id="deleteCartItem" parameterType="int">
+    UPDATE t_shopping_cart
+    SET del_yn = 'Y'
+    WHERE cart_id = #{cart_id}
+  </update>
+</mapper>
