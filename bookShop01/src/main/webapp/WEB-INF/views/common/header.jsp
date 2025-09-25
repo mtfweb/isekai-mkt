@@ -25,7 +25,6 @@
     width: 100%;
   }
 
-  /* ===== 상단 헤더 (로고 + 링크) ===== */
   header {
     width: 100%;
     display: flex;
@@ -43,9 +42,7 @@
     cursor: pointer;
     transition: transform 0.2s ease;
   }
-  #logo img:hover {
-    transform: scale(1.05);
-  }
+  #logo img:hover { transform: scale(1.05); }
 
   /* 상단 링크 */
   #head_link ul {
@@ -61,35 +58,55 @@
     font-weight: 600;
     font-size: 0.85em;
   }
-  #head_link ul li a:hover {
-    color: #6a5acd;
-  }
+  #head_link ul li a:hover { color: #6a5acd; }
 
-  /* ===== 하단 (카테고리 + 검색창) ===== */
-  .category-search-bar {
-    width: 100%;
-    background: rgba(255,255,255,0.95);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 24px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    box-sizing: border-box;
-  }
-
-  /* 카테고리 */
-  .categories {
+  /* ===== 카테고리 바 ===== */
+  .category-bar {
     display: flex;
     gap: 24px;
+    margin-left: 40px;
   }
-  .categories a {
+
+  .category {
+    position: relative;
+  }
+
+  .category-title {
+    font-weight: 700;
+    cursor: pointer;
+    padding: 8px 12px;
+    display: inline-block;
     color: #333;
-    text-decoration: none;
-    font-size: 0.95em;
-    font-weight: 600;
   }
-  .categories a:hover {
+  .category-title:hover { color: #6a5acd; }
+
+  /* 드롭다운 메뉴 */
+  .subcategory {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 160px;
+    background: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 2000;
+  }
+  .subcategory a {
+    display: block;
+    padding: 10px 14px;
+    color: #444;
+    font-size: 0.9em;
+    text-decoration: none;
+  }
+  .subcategory a:hover {
+    background: #f5f5f5;
     color: #6a5acd;
+  }
+
+  /* 마우스 올리면 보이게 */
+  .category:hover .subcategory {
+    display: block;
   }
 
   /* 검색창 */
@@ -137,6 +154,48 @@
         </a>
       </div>
 
+      <!-- 카테고리 메뉴 -->
+      <nav class="category-bar">
+        <div class="category">
+          <span class="category-title">👗 패션</span>
+          <div class="subcategory">
+            <a href="${contextPath}/goods/listGoods.do?sort=men">남성의류</a>
+            <a href="${contextPath}/goods/listGoods.do?sort=women">여성의류</a>
+            <a href="${contextPath}/goods/listGoods.do?sort=shoes">신발</a>
+            <a href="${contextPath}/goods/listGoods.do?sort=bag">가방/잡화</a>
+          </div>
+        </div>
+
+        <div class="category">
+          <span class="category-title">📱 전자제품</span>
+          <div class="subcategory">
+            <a href="${contextPath}/goods/listGoods.do?sort=mobile">모바일</a>
+            <a href="${contextPath}/goods/listGoods.do?sort=pc">컴퓨터/노트북</a>
+            <a href="${contextPath}/goods/listGoods.do?sort=tv">TV/가전</a>
+            <a href="${contextPath}/goods/listGoods.do?sort=audio">음향기기</a>
+          </div>
+        </div>
+
+        <div class="category">
+          <span class="category-title">💄 뷰티</span>
+          <div class="subcategory">
+            <a href="${contextPath}/goods/listGoods.do?sort=cosmetics">화장품</a>
+            <a href="${contextPath}/goods/listGoods.do?sort=skincare">스킨케어</a>
+            <a href="${contextPath}/goods/listGoods.do?sort=perfume">향수</a>
+          </div>
+        </div>
+
+        <div class="category">
+          <span class="category-title">🍳 생활/주방</span>
+          <div class="subcategory">
+            <a href="${contextPath}/goods/listGoods.do?sort=kitchen">주방용품</a>
+            <a href="${contextPath}/goods/listGoods.do?sort=living">리빙/인테리어</a>
+            <a href="${contextPath}/goods/listGoods.do?sort=cleaning">청소/세탁</a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- 로그인 / 회원가입 / 마이페이지 -->
       <div id="head_link">
         <ul>
           <c:choose>
@@ -159,25 +218,16 @@
       </div>
     </header>
 
-    <div class="category-search-bar">
-      <div class="categories">
-        <a href="#">식품</a>
-        <a href="#">패션</a>
-        <a href="#">가전</a>
-        <a href="#">도서</a>
-        <a href="#">생활용품</a>
-      </div>
-
-      <div class="search-box">
-        <form name="frmSearch" action="${contextPath}/goods/searchGoods.do">
-          <input name="searchWord" type="text" placeholder="검색어를 입력하세요">
-          <button type="submit">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path d="M21.53 20.47l-4.69-4.69A7.92 7.92 0 0018 10a8 8 0 10-8 8 7.92 7.92 0 005.78-2.16l4.69 4.69a.75.75 0 101.06-1.06zM10 16a6 6 0 110-12 6 6 0 010 12z"/>
-            </svg>
-          </button>
-        </form>
-      </div>
+    <!-- 검색창 -->
+    <div class="search-box">
+      <form name="frmSearch" action="${contextPath}/goods/searchGoods.do">
+        <input name="searchWord" type="text" placeholder="검색어를 입력하세요">
+        <button type="submit">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M21.53 20.47l-4.69-4.69A7.92 7.92 0 0018 10a8 8 0 10-8 8 7.92 7.92 0 005.78-2.16l4.69 4.69a.75.75 0 101.06-1.06zM10 16a6 6 0 110-12 6 6 0 010 12z"/>
+          </svg>
+        </button>
+      </form>
     </div>
   </div>
 </body>

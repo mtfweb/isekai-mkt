@@ -10,16 +10,18 @@ import com.bookshop01.goods.vo.ImageFileVO;
 import com.bookshop01.order.vo.OrderVO;
 
 public interface AdminGoodsDAO {
-	public int insertNewGoods(Map newGoodsMap) throws DataAccessException;
-	public List<GoodsVO>selectNewGoodsList(Map condMap) throws DataAccessException;
-	public GoodsVO selectGoodsDetail(int goods_id) throws DataAccessException;
-	public List selectGoodsImageFileList(int goods_id) throws DataAccessException;
-	public void insertGoodsImageFile(List fileList)  throws DataAccessException;
-	public void updateGoodsInfo(Map goodsMap) throws DataAccessException;
-	public void updateGoodsImage(List<ImageFileVO> imageFileList) throws DataAccessException;
-	public void deleteGoodsImage(int image_id) throws DataAccessException;
-	public void deleteGoodsImage(List fileList) throws DataAccessException;
-	public List<OrderVO> selectOrderGoodsList(Map condMap) throws DataAccessException;
-	public void updateOrderGoods(Map orderMap) throws DataAccessException;
-	
+    int insertNewGoods(Map<String, Object> newGoodsMap) throws DataAccessException;
+
+    // ✅ selectNewGoodsList는 여기로 빼야 함
+    List<GoodsVO> selectNewGoodsList(Map<String, Object> dateMap) throws DataAccessException;
+
+    GoodsVO selectGoodsDetail(int goods_id) throws DataAccessException;
+    List<ImageFileVO> selectGoodsImageFileList(int goods_id) throws DataAccessException;
+    void insertGoodsImageFile(List<ImageFileVO> fileList) throws DataAccessException;
+    void updateGoodsInfo(Map<String, Object> goodsMap) throws DataAccessException;
+    void updateGoodsImage(List<ImageFileVO> imageFileList) throws DataAccessException;
+    void deleteGoodsImage(int image_id) throws DataAccessException;
+    void deleteGoodsImage(List<ImageFileVO> fileList) throws DataAccessException;
+    List<OrderVO> selectOrderGoodsList(Map<String, Object> condMap) throws DataAccessException;
+    void updateOrderGoods(Map<String, Object> orderMap) throws DataAccessException;
 }

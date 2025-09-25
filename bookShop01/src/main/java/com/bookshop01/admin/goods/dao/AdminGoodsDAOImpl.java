@@ -33,10 +33,19 @@ public class AdminGoodsDAOImpl  implements AdminGoodsDAO{
 	}
 		
 	@Override
-	public List<GoodsVO>selectNewGoodsList(Map condMap) throws DataAccessException {
-		ArrayList<GoodsVO>  goodsList=(ArrayList)sqlSession.selectList("mapper.admin.goods.selectNewGoodsList",condMap);
-		return goodsList;
+	public List<GoodsVO> selectNewGoodsList(Map<String, Object> dateMap) throws DataAccessException {
+	    int section = Integer.parseInt((String) dateMap.get("section"));
+	    int pageNum = Integer.parseInt((String) dateMap.get("pageNum"));
+
+	    int pageSize = 10; // 한 페이지당 10개 (원하는대로 변경 가능)
+	    int offset = (pageNum - 1) * pageSize + (section - 1) * 100;
+
+	    dateMap.put("pageSize", pageSize);
+	    dateMap.put("offset", offset);
+
+	    return sqlSession.selectList("mapper.admin.goods.selectNewGoodsList", dateMap);
 	}
+
 	
 	@Override
 	public GoodsVO selectGoodsDetail(int goods_id) throws DataAccessException{
