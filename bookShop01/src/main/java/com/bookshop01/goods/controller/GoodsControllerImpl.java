@@ -1,6 +1,9 @@
 package com.bookshop01.goods.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,7 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +35,10 @@ public class GoodsControllerImpl extends BaseController implements GoodsControll
 	@Autowired
 	private GoodsService goodsService;
 
+	@Autowired
+	@Qualifier("sqlSession")   // bean id가 sqlSession이면 붙여주기
+    private SqlSessionTemplate sqlSession;
+    
 	// 상품 상세 페이지
 	@RequestMapping(value = "/goodsDetail.do", method = RequestMethod.GET)
 	public ModelAndView goodsDetail(@RequestParam("goods_id") String goods_id, HttpServletRequest request,
@@ -110,9 +119,51 @@ public class GoodsControllerImpl extends BaseController implements GoodsControll
 		session.setAttribute("quickGoodsListNum", quickGoodsList.size());
 	}
 
-	@RequestMapping(value = "/goods/list", method = RequestMethod.GET)
-	public String listGoods(Model model) {
-		// model.addAttribute("goodsList", service.find...());
-		return "goods/listGoods"; // 앞에 슬래시 붙이지 말기
-	}
+    // 카테고리 제목 클릭: group=fashion 등
+    // 소분류 클릭: sort=men, sort=mobile 등
+    @RequestMapping(value = {"/list", "/listGoods.do"}, method = RequestMethod.GET)
+    public String listGoods(@RequestParam(value="group", required=false) String group,
+                            @RequestParam(value="sort",  required=false) String sort,
+                            @RequestParam(value="status", required=false) String status,
+                            @RequestParam(value="page",   required=false, defaultValue="1") int page,
+                            Model model) {
+
+        final int pageSize = 20;
+        final int offset   = (Math.max(page, 1) - 1) * pageSize;
+
+        // 그룹 → 소분류 코드 매핑 (DB 혼재 대비해 한글 코드도 같이 포함 가능)
+        Map<String, List<String>> groupMap = new HashMap<>();
+        groupMap.put("fashion",     Arrays.asList("men","women","shoes","bag","패션"));
+        groupMap.put("electronics", Arrays.asList("mobile","pc","tv","audio"));
+        groupMap.put("beauty",      Arrays.asList("cosmetics","skincare","perfume"));
+        groupMap.put("living",      Arrays.asList("kitchen","living","cleaning"));
+        // 필요시 확장:
+        groupMap.put("book",        Arrays.asList("book","도서"));
+        groupMap.put("food",        Arrays.asList("food","식품"));
+
+        List<String> sorts;
+        if (sort != null && !sort.trim().isEmpty()) {
+            sorts = Collections.singletonList(sort.trim());
+        } else if (group != null && groupMap.containsKey(group)) {
+            sorts = groupMap.get(group);
+        } else {
+            sorts = Collections.emptyList(); // 필터 없으면 빈 목록
+        }
+
+        Map<String,Object> p = new HashMap<>();
+        p.put("goodsSortList", sorts);
+        if (status != null && !status.trim().isEmpty()) p.put("goods_status", status.trim());
+        p.put("limit",  pageSize);
+        p.put("offset", offset);
+
+        // IN 쿼리 하나로 정리
+        List<com.bookshop01.goods.vo.GoodsVO> goodsList =
+            sqlSession.selectList("mapper.goods.selectGoodsListBySortIn", p);
+
+        model.addAttribute("goodsList", goodsList);
+        model.addAttribute("selectedGroup", group);
+        model.addAttribute("selectedSort", sort);
+        model.addAttribute("selectedStatus", status);
+        return "goods/listGoods"; // Tiles/IRVR에서 goods/listGoods.jsp로 렌더
+    }
 }
