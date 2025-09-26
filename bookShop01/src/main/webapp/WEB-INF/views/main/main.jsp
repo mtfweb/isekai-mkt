@@ -7,10 +7,29 @@
 
 <style>
   body {
-    margin: 0;
-    font-family: 'Nunito', sans-serif;
-    background: radial-gradient(circle at top left, #fdfbfb, #f3e7f3, #e3f0ff);
+  margin: 0;
+  height: 100vh;
+  background: linear-gradient(-45deg, #23a6d5, #23d5ab, #f0e130);
+  background-size: 400% 400%;
+  animation: auroraGradient 10s ease-in-out infinite;
+  transition: background 0.5s;
+  color: #666;
+  font-family: "Dotum", Arial, serif;
+  font-size: 1em;
+  overflow-x: hidden;
+  width: 100%;
+}
+@keyframes auroraGradient {
+  0% {
+    background-position: 0% 50%;
   }
+  50% {
+    background-position: 100% 50%;
+  } 
+  100% {
+    background-position: 0% 50%;
+  }
+}
 
   /* 메인 전체 */
   #main {
