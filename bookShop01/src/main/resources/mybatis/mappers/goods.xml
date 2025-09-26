@@ -54,12 +54,12 @@
     WHERE g.goods_id = #{goods_id}
   </select>
 
-  <!-- 상품 이미지 리스트 -->
-  <select id="selectGoodsImageFileList" resultMap="imageResult" parameterType="String">
-    SELECT * 
-    FROM t_goods_detail_image
-    WHERE goods_id = #{goods_id}
-    ORDER BY image_id ASC
-  </select>
+  <!-- 상품 이미지 리스트 (DAO/Service에서 호출하는 id와 동일하게 수정) -->
+  <select id="selectGoodsDetailImage" resultMap="imageResult" parameterType="String">
+  SELECT * 
+  FROM t_goods_detail_image
+  WHERE goods_id = #{goods_id}
+  ORDER BY image_id ASC
+</select>
 
 </mapper>

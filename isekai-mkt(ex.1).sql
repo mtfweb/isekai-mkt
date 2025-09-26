@@ -108,4 +108,10 @@ ALTER TABLE t_shopping_goods
 ADD COLUMN goods_fileName VARCHAR(255) NULL COMMENT '대표 이미지 파일명';
 ALTER TABLE t_shopping_goods ADD COLUMN goods_point INT NULL COMMENT '상품 포인트';
 
+ALTER TABLE t_shopping_cart 
+ADD COLUMN cart_goods_qty INT NOT NULL DEFAULT 1 COMMENT '장바구니에 담은 수량';
+
+
+
+
 

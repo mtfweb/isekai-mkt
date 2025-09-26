@@ -4,8 +4,18 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> 
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
-<c:set var="myCartList" value="${cartMap.myCartList}" />
-<c:set var="myGoodsList" value="${cartMap.myGoodsList}" />
+
+<!-- cartMap이 있을 때와 없을 때 모두 대응 -->
+<c:choose>
+	<c:when test="${not empty cartMap}">
+		<c:set var="myCartList" value="${cartMap.myCartList}" />
+		<c:set var="myGoodsList" value="${cartMap.myGoodsList}" />
+	</c:when>
+	<c:otherwise>
+		<c:set var="myCartList" value="${myCartList}" />
+		<c:set var="myGoodsList" value="${myGoodsList}" />
+	</c:otherwise>
+</c:choose>
 
 <c:set var="totalGoodsNum" value="0" />
 <c:set var="totalDeliveryPrice" value="0" />
