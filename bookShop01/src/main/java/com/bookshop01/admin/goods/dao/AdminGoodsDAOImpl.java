@@ -19,9 +19,14 @@ public class AdminGoodsDAOImpl  implements AdminGoodsDAO{
 	private SqlSession sqlSession;
 	
 	@Override
-	public int insertNewGoods(Map newGoodsMap) throws DataAccessException {
-		sqlSession.insert("mapper.admin.goods.insertNewGoods",newGoodsMap);
-		return Integer.parseInt((String)newGoodsMap.get("goods_id"));
+	public int insertNewGoods(Map<String, Object> newGoodsMap) {
+	    sqlSession.insert("mapper.admin.goods.insertNewGoods", newGoodsMap);
+
+	    // useGeneratedKeys ë˜ëŠ” selectKeyë¡œ ì±„ì›Œì§„ í‚¤ êº¼ë‚´ê¸° (Long/Integer ë“± ëª¨ë‘ ëŒ€ì‘)
+	    Object key = newGoodsMap.get("goods_id");
+	    if (key == null) return 0;
+	    return (key instanceof Number) ? ((Number) key).intValue()
+	                                   : Integer.parseInt(String.valueOf(key));
 	}
 	
 	@Override
@@ -37,7 +42,7 @@ public class AdminGoodsDAOImpl  implements AdminGoodsDAO{
 	    int section = Integer.parseInt((String) dateMap.get("section"));
 	    int pageNum = Integer.parseInt((String) dateMap.get("pageNum"));
 
-	    int pageSize = 10; // ÇÑ ÆäÀÌÁö´ç 10°³ (¿øÇÏ´Â´ë·Î º¯°æ °¡´É)
+	    int pageSize = 10; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 10ï¿½ï¿½ (ï¿½ï¿½ï¿½Ï´Â´ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
 	    int offset = (pageNum - 1) * pageSize + (section - 1) * 100;
 
 	    dateMap.put("pageSize", pageSize);

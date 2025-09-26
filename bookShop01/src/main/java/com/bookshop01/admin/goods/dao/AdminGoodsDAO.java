@@ -10,8 +10,7 @@ import com.bookshop01.goods.vo.ImageFileVO;
 import com.bookshop01.order.vo.OrderVO;
 
 public interface AdminGoodsDAO {
-    int insertNewGoods(Map<String, Object> newGoodsMap) throws DataAccessException;
-
+    int insertNewGoods(Map<String, Object> newGoodsMap); // throws 없음
     // ✅ selectNewGoodsList는 여기로 빼야 함
     List<GoodsVO> selectNewGoodsList(Map<String, Object> dateMap) throws DataAccessException;
 
