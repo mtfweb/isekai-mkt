@@ -13,7 +13,7 @@
 		<result property="goods_price" column="goods_price" />
 		<result property="goods_sales_price" column="goods_sales_price" />
 		<result property="goods_status" column="goods_status" />
-		<result property="goods_fileName" column="fileName" />
+		<result property="goods_fileName" column="goods_fileName" />
 		<result property="goods_sort" column="goods_sort" />
 		<result property="goods_intro" column="goods_intro" />
 		<result property="goods_contents_order"
@@ -39,29 +39,25 @@
 		g.goods_title,
 		g.goods_sales_price,
 		g.goods_status,
-		d.fileName
+		d.fileName AS goods_fileName
 		FROM t_shopping_goods g
 		LEFT JOIN
 		t_goods_detail_image d
 		ON g.goods_id = d.goods_id
-		AND d.fileType =
-		'main_image'
+		AND d.fileType = 'main_image'
 		WHERE g.goods_status = #{goods_status}
-		ORDER
-		BY g.goods_id
-		DESC
+		ORDER BY g.goods_id DESC
 	</select>
 
 	<!-- 상품 상세 조회 -->
 	<select id="selectGoodsDetail" resultMap="goodsResult"
 		parameterType="long">
-		SELECT g.*, d.fileName
+		SELECT g.*, d.fileName AS goods_fileName
 		FROM t_shopping_goods g
 		LEFT JOIN
 		t_goods_detail_image d
 		ON g.goods_id = d.goods_id
-		AND d.fileType =
-		'main_image'
+		AND d.fileType = 'main_image'
 		WHERE g.goods_id = #{goods_id}
 	</select>
 
@@ -71,10 +67,8 @@
 		SELECT
 		image_id, goods_id, fileName, fileType, reg_id
 		FROM t_goods_detail_image
-		WHERE
-		goods_id = #{goods_id}
-		ORDER BY image_id
-		ASC
+		WHERE goods_id = #{goods_id}
+		ORDER BY image_id ASC
 	</select>
 
 	<!-- 카테고리 기반 상품 리스트 (하위 포함) -->
@@ -86,21 +80,14 @@
 		g.goods_price,
 		g.goods_sales_price,
 		g.goods_status,
-		d.fileName
+		d.fileName AS goods_fileName
 		FROM t_shopping_goods g
-		JOIN
-		t_goods_category_map m ON m.goods_id =
-		g.goods_id
-		JOIN t_category c ON
-		c.category_id = m.category_id
-		LEFT JOIN
-		t_goods_detail_image d
-		ON
-		d.goods_id = g.goods_id
+		JOIN t_goods_category_map m ON m.goods_id = g.goods_id
+		JOIN t_category c ON c.category_id = m.category_id
+		LEFT JOIN t_goods_detail_image d
+		ON d.goods_id = g.goods_id
 		AND d.fileType = 'main_image'
-		WHERE c.path LIKE
-		CONCAT(#{categoryPath},
-		'%')
+		WHERE c.path LIKE CONCAT(#{categoryPath}, '%')
 		<if test="goods_status != null and goods_status != ''">
 			AND g.goods_status = #{goods_status}
 		</if>
@@ -109,40 +96,36 @@
 			LIMIT #{limit} OFFSET #{offset}
 		</if>
 	</select>
-<select id="selectGoodsBySearchWord" parameterType="string" resultMap="goodsResult">
-    SELECT
-        g.goods_id,
-        g.goods_title,
-        g.goods_price,
-        g.goods_sales_price,
-        g.goods_status,
-        d.fileName
-    FROM t_shopping_goods g
-    LEFT JOIN t_goods_detail_image d
-      ON g.goods_id = d.goods_id
-     AND d.fileType = 'main_image'
-    WHERE g.goods_title LIKE CONCAT('%', #{searchWord}, '%')
-    ORDER BY g.goods_id DESC
-</select>
+
+	<!-- 검색어 기반 상품 조회 -->
+	<select id="selectGoodsBySearchWord" parameterType="string" resultMap="goodsResult">
+	    SELECT
+	        g.goods_id,
+	        g.goods_title,
+	        g.goods_price,
+	        g.goods_sales_price,
+	        g.goods_status,
+	        d.fileName AS goods_fileName
+	    FROM t_shopping_goods g
+	    LEFT JOIN t_goods_detail_image d
+	      ON g.goods_id = d.goods_id
+	     AND d.fileType = 'main_image'
+	    WHERE g.goods_title LIKE CONCAT('%', #{searchWord}, '%')
+	    ORDER BY g.goods_id DESC
+	</select>
+
 	<!-- 특정 카테고리의 자식 카테고리 조회 -->
 	<select id="selectChildCategories" parameterType="map"
 		resultType="map">
-		SELECT
-		category_id,
-		parent_id,
-		category_code,
-		category_name,
-		path,
-		depth,
-		sort_order,
-		use_yn
+		SELECT category_id, parent_id, category_code, category_name,
+		       path, depth, sort_order, use_yn
 		FROM t_category
 		WHERE
 		<choose>
 			<when test="parentPath != null and parentPath != ''">
 				path LIKE CONCAT(#{parentPath}, '/%')
 				AND depth = (
-				SELECT depth + 1 FROM t_category WHERE path = #{parentPath}
+					SELECT depth + 1 FROM t_category WHERE path = #{parentPath}
 				)
 			</when>
 			<otherwise>
@@ -156,37 +139,20 @@
 	<!-- 한 상품의 디테일 이미지들 -->
 	<select id="selectGoodsDetailImage" resultMap="imageResult"
 		parameterType="long">
-		SELECT
-		image_id,
-		goods_id,
-		fileName,
-		fileType,
-		reg_id
-		FROM
-		t_goods_detail_image
+		SELECT image_id, goods_id, fileName, fileType, reg_id
+		FROM t_goods_detail_image
 		WHERE goods_id = #{goods_id}
-		AND fileType =
-		'detail_image'
-		-- ⚠️ sort_order 제거 (DB에 없음 → 오류 원인)
-		ORDER BY
-		image_id ASC
+		  AND fileType = 'detail_image'
+		ORDER BY image_id ASC
 	</select>
 
 	<!-- 카테고리 코드로 단일 카테고리 -->
 	<select id="selectCategoryByCode" parameterType="string"
 		resultType="map">
-		SELECT
-		category_id,
-		parent_id,
-		category_code,
-		category_name,
-		path,
-		depth,
-		sort_order,
-		use_yn
+		SELECT category_id, parent_id, category_code, category_name,
+		       path, depth, sort_order, use_yn
 		FROM t_category
-		WHERE category_code =
-		#{category_code}
+		WHERE category_code = #{category_code}
 		LIMIT 1
 	</select>
 
@@ -195,36 +161,22 @@
 		resultType="int">
 		SELECT COUNT(*)
 		FROM t_goods_category_map
-		WHERE goods_id =
-		#{goods_id}
-		AND category_id = #{category_id}
+		WHERE goods_id = #{goods_id}
+		  AND category_id = #{category_id}
 	</select>
 
-	<!-- path 또는 code로 카테고리 필터링 (하위 포함) -->
+	<!-- path 또는 code로 카테고리 필터링 -->
 	<select id="selectGoodsListByCategoryFlexible"
 		resultMap="goodsResult" parameterType="map">
-		SELECT
-		g.goods_id,
-		g.goods_title,
-		g.goods_price,
-		g.goods_sales_price,
-		g.goods_status,
-		d.fileName
+		SELECT g.goods_id, g.goods_title, g.goods_price, g.goods_sales_price,
+		       g.goods_status, d.fileName AS goods_fileName
 		FROM t_shopping_goods g
-		JOIN
-		t_goods_category_map m
-		ON m.goods_id = g.goods_id
-		JOIN t_category c
-		ON
-		c.category_id = m.category_id
-		<!-- code로 들어올 때 기준 경로를 구하기 위한 조인 -->
-		LEFT JOIN t_category base
-		ON base.category_code = #{category_code}
-		LEFT
-		JOIN t_goods_detail_image d
-		ON d.goods_id = g.goods_id
-		AND d.fileType =
-		'main_image'
+		JOIN t_goods_category_map m ON m.goods_id = g.goods_id
+		JOIN t_category c ON c.category_id = m.category_id
+		LEFT JOIN t_category base ON base.category_code = #{category_code}
+		LEFT JOIN t_goods_detail_image d
+		  ON d.goods_id = g.goods_id
+		 AND d.fileType = 'main_image'
 		WHERE 1=1
 		<choose>
 			<when test="categoryPath != null and categoryPath != ''">
@@ -232,11 +184,10 @@
 			</when>
 			<when test="category_code != null and category_code != ''">
 				AND base.path IS NOT NULL
-				AND c.path LIKE
-				CONCAT(base.path, '%')
+				AND c.path LIKE CONCAT(base.path, '%')
 			</when>
 			<otherwise>
-				AND 1=0  <!-- 필터 없으면 목록을 비우도록 명시 -->
+				AND 1=0
 			</otherwise>
 		</choose>
 		<if test="goods_status != null and goods_status != ''">
@@ -248,22 +199,15 @@
 		</if>
 	</select>
 
-	<!-- goods_sort 컬럼으로 분류 필터 -->
+	<!-- goods_sort 컬럼으로 분류 -->
 	<select id="selectGoodsListBySort" resultMap="goodsResult"
 		parameterType="map">
-		SELECT
-		g.goods_id,
-		g.goods_title,
-		g.goods_price,
-		g.goods_sales_price,
-		g.goods_status,
-		d.fileName
+		SELECT g.goods_id, g.goods_title, g.goods_price, g.goods_sales_price,
+		       g.goods_status, d.fileName AS goods_fileName
 		FROM t_shopping_goods g
-		LEFT JOIN
-		t_goods_detail_image d
-		ON d.goods_id = g.goods_id
-		AND d.fileType =
-		'main_image'
+		LEFT JOIN t_goods_detail_image d
+		  ON d.goods_id = g.goods_id
+		 AND d.fileType = 'main_image'
 		WHERE 1=1
 		<if test="goods_sort != null and goods_sort != ''">
 			AND TRIM(g.goods_sort) = TRIM(#{goods_sort})
@@ -280,18 +224,16 @@
 	<!-- goods_sort IN (...) -->
 	<select id="selectGoodsListBySortIn" resultMap="goodsResult"
 		parameterType="map">
-		SELECT
-		g.goods_id, g.goods_title, g.goods_price, g.goods_sales_price, g.goods_status,
-		d.fileName
+		SELECT g.goods_id, g.goods_title, g.goods_price, g.goods_sales_price,
+		       g.goods_status, d.fileName AS goods_fileName
 		FROM t_shopping_goods g
 		LEFT JOIN t_goods_detail_image d
-		ON d.goods_id = g.goods_id
-		AND d.fileType = 'main_image'
+		  ON d.goods_id = g.goods_id
+		 AND d.fileType = 'main_image'
 		WHERE 1=1
 		<if test="goodsSortList != null and goodsSortList.size() > 0">
 			AND TRIM(g.goods_sort) IN
-			<foreach collection="goodsSortList" item="s" open="("
-				separator="," close=")">
+			<foreach collection="goodsSortList" item="s" open="(" separator="," close=")">
 				TRIM(#{s})
 			</foreach>
 		</if>
@@ -306,10 +248,43 @@
 
 	<!-- 상품-카테고리 매핑 추가 -->
 	<insert id="insertGoodsCategoryMap" parameterType="map">
-		INSERT IGNORE
-		INTO t_goods_category_map (goods_id, category_id)
-		VALUES (#{goods_id},
-		#{category_id})
+		INSERT IGNORE INTO t_goods_category_map (goods_id, category_id)
+		VALUES (#{goods_id}, #{category_id})
 	</insert>
+
+	<!-- ===================== -->
+	<!-- ✅ 관리자용 추가 기능 -->
+	<!-- ===================== -->
+
+	<!-- 상품 삭제 -->
+	<delete id="deleteGoods" parameterType="int">
+		DELETE FROM t_shopping_goods
+		WHERE goods_id = #{goods_id}
+	</delete>
+
+	<!-- 상품 상태 변경 -->
+	<update id="updateGoodsStatus" parameterType="map">
+		UPDATE t_shopping_goods
+		SET goods_status = #{status}
+		WHERE goods_id = #{goods_id}
+	</update>
+
+	<!-- 관리자 검색용 -->
+	<select id="searchGoods" parameterType="map" resultMap="goodsResult">
+		SELECT g.goods_id, g.goods_title, g.goods_price, g.goods_sales_price,
+		       g.goods_status, d.fileName AS goods_fileName
+		FROM t_shopping_goods g
+		LEFT JOIN t_goods_detail_image d
+		  ON g.goods_id = d.goods_id
+		 AND d.fileType = 'main_image'
+		WHERE 1=1
+		<if test="searchWord != null and searchWord != ''">
+			AND g.goods_title LIKE CONCAT('%', #{searchWord}, '%')
+		</if>
+		<if test="goods_status != null and goods_status != ''">
+			AND g.goods_status = #{goods_status}
+		</if>
+		ORDER BY g.goods_id DESC
+	</select>
 
 </mapper>

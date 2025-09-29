@@ -25,8 +25,11 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import com.bookshop01.goods.vo.ImageFileVO;
 
 public abstract class BaseController  {
-	private static final String CURR_IMAGE_REPO_PATH = "C:\\shopping\\file_repo";
-	
+	// âš¡ Cafe24 ì„œë²„ ì—…ë¡œë“œ ê²½ë¡œ (ìƒí’ˆ ì´ë¯¸ì§€ ì €ì¥)
+	private static final String CURR_IMAGE_REPO_PATH = "/home/hosting_users/kwun167/uploads/goods";
+	// âš¡ ì›¹ ì ‘ê·¼ URL prefix (JSPì—ì„œ ë¶ˆëŸ¬ì˜¬ ë•Œ ì‚¬ìš©)
+	protected static final String IMAGE_URL_PREFIX = "/uploads/goods/";
+
 	protected List<ImageFileVO> upload(MultipartHttpServletRequest multipartRequest) throws Exception{
 		List<ImageFileVO> fileList= new ArrayList<ImageFileVO>();
 		Iterator<String> fileNames = multipartRequest.getFileNames();
@@ -37,23 +40,28 @@ public abstract class BaseController  {
 			MultipartFile mFile = multipartRequest.getFile(fileName);
 			String originalFileName=mFile.getOriginalFilename();
 			imageFileVO.setFileName(originalFileName);
+
+			// âš¡ JSPì—ì„œ ì´ë¯¸ì§€ ë¶ˆëŸ¬ì˜¬ ìˆ˜ ìˆëŠ” URL ê²½ë¡œ ì €ì¥
+			imageFileVO.setFileUrl(IMAGE_URL_PREFIX + originalFileName);
+
 			fileList.add(imageFileVO);
 			
-			File file = new File(CURR_IMAGE_REPO_PATH +"\\"+ fileName);
+			File file = new File(CURR_IMAGE_REPO_PATH + File.separator + fileName);
 			if(mFile.getSize()!=0){ //File Null Check
-				if(! file.exists()){ //°æ·Î»ó¿¡ ÆÄÀÏÀÌ Á¸ÀçÇÏÁö ¾ÊÀ» °æ¿ì
-					if(file.getParentFile().mkdirs()){ //°æ·Î¿¡ ÇØ´çÇÏ´Â µğ·ºÅä¸®µéÀ» »ı¼º
-							file.createNewFile(); //ÀÌÈÄ ÆÄÀÏ »ı¼º
+				if(! file.exists()){ //ê²½ë¡œìƒì— íŒŒì¼ì´ ì¡´ì¬í•˜ì§€ ì•Šì„ ê²½ìš°
+					if(file.getParentFile().mkdirs()){ //ê²½ë¡œì— í•´ë‹¹í•˜ëŠ” ë””ë ‰í† ë¦¬ë“¤ì„ ìƒì„±
+							file.createNewFile(); //ì´í›„ íŒŒì¼ ìƒì„±
 					}
 				}
-				mFile.transferTo(new File(CURR_IMAGE_REPO_PATH +"\\"+"temp"+ "\\"+originalFileName)); //ÀÓ½Ã·Î ÀúÀåµÈ multipartFileÀ» ½ÇÁ¦ ÆÄÀÏ·Î Àü¼Û
+				// âš¡ ì‹¤ì œ ì„œë²„ ì—…ë¡œë“œ í´ë”ì— ì €ì¥
+				mFile.transferTo(new File(CURR_IMAGE_REPO_PATH + File.separator + originalFileName));
 			}
 		}
 		return fileList;
 	}
 	
 	private void deleteFile(String fileName) {
-		File file =new File(CURR_IMAGE_REPO_PATH+"\\"+fileName);
+		File file =new File(CURR_IMAGE_REPO_PATH+File.separator+fileName);
 		try{
 			file.delete();
 		}catch(Exception e){

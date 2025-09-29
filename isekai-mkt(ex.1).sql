@@ -110,8 +110,37 @@ ALTER TABLE t_shopping_goods ADD COLUMN goods_point INT NULL COMMENT '상품 포
 
 ALTER TABLE t_shopping_cart 
 ADD COLUMN cart_goods_qty INT NOT NULL DEFAULT 1 COMMENT '장바구니에 담은 수량';
+ALTER TABLE t_shopping_cart 
+ADD COLUMN credate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일';
+ALTER TABLE t_shopping_cart 
+ADD COLUMN del_yn CHAR(1) NOT NULL DEFAULT 'N' COMMENT '삭제여부';
 
 
+DESC t_category;
+
+ALTER TABLE t_shopping_order
+    ADD COLUMN orderer_name     VARCHAR(50),   -- 주문자 이름
+    ADD COLUMN order_goods_qty  INT,           -- 주문 수량 (order_qty와 중복 → order_qty 대신 사용 가능)
+    ADD COLUMN goods_sales_price INT,          -- 판매가
+    ADD COLUMN goods_title      VARCHAR(200),  -- 상품명
+    ADD COLUMN receiver_name    VARCHAR(50),   -- 수령자 이름
+    ADD COLUMN receiver_hp1     VARCHAR(5),
+    ADD COLUMN receiver_hp2     VARCHAR(5),
+    ADD COLUMN receiver_hp3     VARCHAR(5),
+    ADD COLUMN delivery_address VARCHAR(500),  -- 배송주소
+    ADD COLUMN delivery_state   VARCHAR(20),   -- 배송 상태
+    ADD COLUMN pay_method       VARCHAR(20),   -- 결제 방법
+    ADD COLUMN pay_order_time   DATETIME,      -- 결제일시
+    ADD COLUMN final_total_price INT;          -- 최종 결제 금액
+
+INSERT INTO t_goods_detail_image (goods_id, fileName, fileType, reg_id)
+VALUES
+(14, 'generated-image.png', 'main_image', 'admin'),
+(13, 'duke.png', 'main_image', 'admin'),
+(11, 'T-shirt.png', 'main_image', 'admin'),
+(8, '1803015_754650_1739.jpg', 'main_image', 'admin'),
+(7, 'galaxy-book-3-1.jpeg', 'main_image', 'admin'),
+(3, 'basic-tshirt.png', 'main_image', 'admin');
 
 
 

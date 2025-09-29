@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
@@ -7,36 +7,29 @@
 
 <style>
   body {
-  margin: 0;
-  height: 100vh;
-  background: linear-gradient(-45deg, #23a6d5, #23d5ab, #f0e130);
-  background-size: 400% 400%;
-  animation: auroraGradient 10s ease-in-out infinite;
-  transition: background 0.5s;
-  color: #666;
-  font-family: "Dotum", Arial, serif;
-  font-size: 1em;
-  overflow-x: hidden;
-  width: 100%;
-}
-@keyframes auroraGradient {
-  0% {
-    background-position: 0% 50%;
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(-45deg, #23a6d5, #23d5ab, #f0e130);
+    background-size: 400% 400%;
+    animation: auroraGradient 10s ease-in-out infinite;
+    transition: background 0.5s;
+    color: #666;
+    font-family: "Dotum", Arial, serif;
+    font-size: 1em;
+    overflow-x: hidden;
+    width: 100%;
   }
-  50% {
-    background-position: 100% 50%;
-  } 
-  100% {
-    background-position: 0% 50%;
+  @keyframes auroraGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
-}
 
-  /* 메인 전체 */
   #main {
     width: 100%;
     padding: 30px 40px;
     box-sizing: border-box;
-     justify-content: center;
+    justify-content: center;
   }
 
   #main h3 {
@@ -47,7 +40,6 @@
     padding-left: 14px;
   }
 
-  /* 상품 리스트: 좌우 꽉 차도록 */
   .goods-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -55,7 +47,6 @@
     width: 100%;
   }
 
-  /* 상품 카드 */
   .goods-item {
     background: #fff;
     border-radius: 12px;
@@ -77,29 +68,10 @@
     margin-bottom: 12px;
   }
 
-  .goods-title {
-    font-weight: 700;
-    margin: 6px 0;
-  }
-
-  .goods-category {
-    font-size: 0.9em;
-    color: #777;
-  }
-
-  .goods-intro {
-    font-size: 0.85em;
-    color: #555;
-    height: 36px;
-    overflow: hidden;
-  }
-
-  .goods-price {
-    font-size: 1em;
-    font-weight: bold;
-    color: #6a5acd;
-    margin-top: 6px;
-  }
+  .goods-title { font-weight: 700; margin: 6px 0; }
+  .goods-category { font-size: 0.9em; color: #777; }
+  .goods-intro { font-size: 0.85em; color: #555; height: 36px; overflow: hidden; }
+  .goods-price { font-size: 1em; font-weight: bold; color: #6a5acd; margin-top: 6px; }
 </style>
 
 <div id="main">
@@ -109,7 +81,9 @@
     <c:forEach var="item" items="${goodsMap.bestseller}">
       <div class="goods-item">
         <a href="${contextPath}/goods/goodsDetail.do?goods_id=${item.goods_id}">
-          <img src="${contextPath}/thumbnails.do?goods_id=${item.goods_id}&fileName=${item.goods_fileName}" />
+          <img src="${contextPath}/uploads/${item.goods_id}/${item.goods_fileName}" 
+               onerror="this.src='${contextPath}/resources/image/no-image.png';" 
+               alt="상품 이미지"/>
           <p class="goods-title">${item.goods_title}</p>
           <p class="goods-category">카테고리: ${item.goods_sort}</p>
           <p class="goods-intro">${item.goods_intro}</p>
@@ -127,7 +101,9 @@
     <c:forEach var="item" items="${goodsMap.newbook}">
       <div class="goods-item">
         <a href="${contextPath}/goods/goodsDetail.do?goods_id=${item.goods_id}">
-          <img src="${contextPath}/thumbnails.do?goods_id=${item.goods_id}&fileName=${item.goods_fileName}" />
+          <img src="${contextPath}/uploads/${item.goods_id}/${item.goods_fileName}" 
+               onerror="this.src='${contextPath}/resources/image/no-image.png';" 
+               alt="상품 이미지"/>
           <p class="goods-title">${item.goods_title}</p>
           <p class="goods-category">카테고리: ${item.goods_sort}</p>
           <p class="goods-intro">${item.goods_intro}</p>
@@ -145,7 +121,9 @@
     <c:forEach var="item" items="${goodsMap.steadyseller}">
       <div class="goods-item">
         <a href="${contextPath}/goods/goodsDetail.do?goods_id=${item.goods_id}">
-          <img src="${contextPath}/thumbnails.do?goods_id=${item.goods_id}&fileName=${item.goods_fileName}" />
+          <img src="${contextPath}/uploads/${item.goods_id}/${item.goods_fileName}" 
+               onerror="this.src='${contextPath}/resources/image/no-image.png';" 
+               alt="상품 이미지"/>
           <p class="goods-title">${item.goods_title}</p>
           <p class="goods-category">카테고리: ${item.goods_sort}</p>
           <p class="goods-intro">${item.goods_intro}</p>

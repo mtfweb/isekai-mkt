@@ -13,10 +13,11 @@
 				<c:forEach var="g" items="${goodsList}">
 					<div class="card">
 						<a class="thumb" href="${ctx}/goods/detail?goods_id=${g.goods_id}"
-							aria-label="${g.goods_title}"> <c:choose>
+							aria-label="${g.goods_title}">
+							<c:choose>
 								<c:when test="${not empty g.goods_fileName}">
 									<img loading="lazy"
-										src="${ctx}/goods/images/${g.goods_id}/${g.goods_fileName}"
+										src="${ctx}/thumbnails.do?goods_id=${g.goods_id}&fileName=${g.goods_fileName}"
 										onerror="this.src='${ctx}/resources/image/no-image.png';"
 										alt="${g.goods_title}" />
 								</c:when>
@@ -29,20 +30,19 @@
 
 						<div class="body">
 							<div class="title" title="${g.goods_title}">
-								${g.goods_title}</div>
+								${g.goods_title}
+							</div>
 
 							<div class="price-row">
 								<c:if test="${not empty g.goods_sales_price}">
 									<div class="price">
-										<fmt:formatNumber value="${g.goods_sales_price}" type="number" />
-										원
+										<fmt:formatNumber value="${g.goods_sales_price}" type="number" /> 원
 									</div>
 								</c:if>
 								<c:if test="${not empty g.goods_price}">
 									<div class="price-ori">
 										<del>
-											<fmt:formatNumber value="${g.goods_price}" type="number" />
-											원
+											<fmt:formatNumber value="${g.goods_price}" type="number" /> 원
 										</del>
 									</div>
 								</c:if>
@@ -51,8 +51,9 @@
 							<div class="meta">
 								<span class="status-chip" data-status="${g.goods_status}">
 									<c:out value="${g.goods_status}" />
-								</span> <span class="file muted" title="${g.goods_fileName}"> <c:out
-										value="${g.goods_fileName}" />
+								</span>
+								<span class="file muted" title="${g.goods_fileName}">
+									<c:out value="${g.goods_fileName}" />
 								</span>
 							</div>
 
@@ -75,14 +76,14 @@
 </div>
 
 <style>
-:root { -
-	-bg: #f7f7fb; -
-	-card: #fff; -
-	-border: #e6e8ef; -
-	-text: #111827; -
-	-muted: #6b7280; -
-	-accent: #6a5acd; -
-	-shadow: 0 10px 24px rgba(17, 24, 39, .06);
+:root {
+	--bg: #f7f7fb;
+	--card: #fff;
+	--border: #e6e8ef;
+	--text: #111827;
+	--muted: #6b7280;
+	--accent: #6a5acd;
+	--shadow: 0 10px 24px rgba(17, 24, 39, .06);
 }
 
 * {
@@ -91,13 +92,13 @@
 
 .wrap {
 	padding: 16px 20px;
-	background: var(- -bg);
+	background: var(--bg);
 }
 
 h2 {
 	margin: 0 0 14px;
 	font-size: 20px;
-	color: var(- -text);
+	color: var(--text);
 }
 
 /* grid */
@@ -109,11 +110,11 @@ h2 {
 
 /* card */
 .card {
-	background: var(- -card);
-	border: 1px solid var(- -border);
+	background: var(--card);
+	border: 1px solid var(--border);
 	border-radius: 16px;
 	overflow: hidden;
-	box-shadow: var(- -shadow);
+	box-shadow: var(--shadow);
 	display: flex;
 	flex-direction: column;
 	transition: transform .08s ease, box-shadow .2s ease;
@@ -156,7 +157,7 @@ h2 {
 .title {
 	font-size: 14px;
 	font-weight: 700;
-	color: var(- -text);
+	color: var(--text);
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
@@ -212,7 +213,7 @@ h2 {
 }
 
 .muted {
-	color: var(- -muted);
+	color: var(--muted);
 	font-size: 11px;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -234,7 +235,7 @@ h2 {
 .btn-view {
 	width: 100%;
 	text-align: center;
-	background: var(- -accent);
+	background: var(--accent);
 	color: #fff;
 	font-weight: 800;
 	box-shadow: 0 6px 14px rgba(106, 90, 205, .22);
@@ -248,13 +249,13 @@ h2 {
 
 /* empty */
 .empty {
-	background: var(- -card);
-	border: 1px dashed var(- -border);
+	background: var(--card);
+	border: 1px dashed var(--border);
 	border-radius: 16px;
 	padding: 36px 24px;
 	text-align: center;
-	color: var(- -muted);
-	box-shadow: var(- -shadow);
+	color: var(--muted);
+	box-shadow: var(--shadow);
 }
 
 .empty .empty-title {

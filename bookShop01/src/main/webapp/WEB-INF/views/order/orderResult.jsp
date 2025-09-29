@@ -1,172 +1,89 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
-	pageEncoding="utf-8"
-	isELIgnored="false"%> 
+    pageEncoding="utf-8"
+    isELIgnored="false"%> 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="contextPath"  value="${pageContext.request.contextPath}"  />
-</head>
-<BODY>
-	<H1>1.최종 주문 내역서</H1>
-	<TABLE class="list_view">
-		<TBODY align=center>
-			<tr style="background: #33ff00">
-			     <td>주문번호 </td>
-				<td colspan=2 class="fixed">주문상품명</td>
-				<td>수량</td>
-				<td>주문금액</td>
-				<td>배송비</td>
-				<td>예상적립금</td>
-				<td>주문금액합계</td>
-			</tr>
-			<TR>
-				<c:forEach var="item" items="${myOrderList }">
-				    <td> ${item.order_id }</td>
-					<TD class="goods_image">
-					  <a href="${contextPath}/goods/goodsDetail.do?goods_id=${item.goods_id }">
-					    <IMG width="75" alt=""  src="${contextPath}/thumbnails.do?goods_id=${item.goods_id}&fileName=${item.goods_fileName}">
-					  </a>
-					</TD>
-					<TD>
-					  <h2>
-					     <A href="${contextPath}/goods/goodsDetail.do?goods_id=${item.goods_id }">${item.goods_title }</A>
-					  </h2>
-					</TD>
-					<td>
-					  <h2>${item.order_goods_qty }개<h2>
-					</td>
-					<td><h2>${item.order_goods_qty *item.goods_sales_price}원 (10% 할인)</h2></td>
-					<td><h2>0원</h2></td>
-					<td><h2>${1500 *item.order_goods_qty }원</h2></td>
-					<td>
-					  <h2>${item.order_goods_qty *item.goods_sales_price}원</h2>
-					</td>
-			</TR>
-			</c:forEach>
-		</TBODY>
-	</TABLE>
-	<DIV class="clear"></DIV>
-<form  name="form_order">
-	<br>
-	<br>
-	<H1>2.배송지 정보</H1>
-	<DIV class="detail_table">
-	
-		<TABLE>
-			<TBODY>
-				<TR class="dot_line">
-					<TD class="fixed_join">배송방법</TD>
-					<TD>
-					   ${myOrderInfo.delivery_method }
-				    </TD>
-				</TR>
-				<TR class="dot_line">
-					<TD class="fixed_join">받으실 분</TD>
-					<TD>
-					${myOrderInfo.receiver_name }
-					</TD>
-				</TR>
-				<TR class="dot_line">
-					<TD class="fixed_join">휴대폰번호</TD>
-					<TD>
-					  ${myOrderInfo.receiver_hp1}-${myOrderInfo.receiver_hp2}-${myOrderInfo.receiver_hp3}</TD>
-				  </TR>
-				<TR class="dot_line">
-					<TD class="fixed_join">유선전화(선택)</TD>
-					<TD>
-					   ${myOrderInfo.receiver_tel1}-${myOrderInfo.receiver_tel2}-${myOrderInfo.receiver_tel3}</TD>
-					</TD>
-				</TR>
 
+<body>
+  <h1>1. 최종 주문 내역서</h1>
+  <table class="list_view" border="1" cellspacing="0" cellpadding="8" align="center">
+    <thead>
+      <tr style="background: #33ff00">
+        <th>주문번호</th>
+        <th colspan="2">주문상품명</th>
+        <th>수량</th>
+        <th>주문금액</th>
+        <th>배송비</th>
+        <th>예상적립금</th>
+        <th>주문금액합계</th>
+      </tr>
+    </thead>
+    <tbody align="center">
+      <c:forEach var="item" items="${myOrderList}">
+        <tr>
+          <td>${item.order_id}</td>
+          <td class="goods_image">
+            <a href="${contextPath}/goods/goodsDetail.do?goods_id=${item.goods_id}">
+              <img width="75" alt="" src="${contextPath}/thumbnails.do?goods_id=${item.goods_id}&fileName=${item.goods_fileName}">
+            </a>
+          </td>
+          <td>
+            <h2>
+              <a href="${contextPath}/goods/goodsDetail.do?goods_id=${item.goods_id}">
+                ${item.goods_title}
+              </a>
+            </h2>
+          </td>
+          <td><h2>${item.order_goods_qty} 개</h2></td>
+          <td><h2>${item.order_goods_qty * item.goods_sales_price} 원</h2></td>
+          <td><h2>0 원</h2></td>
+          <td><h2>${1500 * item.order_goods_qty} 원</h2></td>
+          <td><h2>${item.order_goods_qty * item.goods_sales_price} 원</h2></td>
+        </tr>
+      </c:forEach>
+    </tbody>
+  </table>
 
-				<TR class="dot_line">
-					<TD class="fixed_join">주소</TD>
-					<td>
-					   ${myOrderInfo.delivery_address}
-					</td>>
-				</TR>
-				<TR class="dot_line">
-					<TD class="fixed_join">배송 메시지</TD>
-					<TD>
-					${myOrderInfo.delivery_message}
-					</TD>
-				</TR>
-				<TR class="dot_line">
-					<TD class="fixed_join">선물 포장</TD>
-					<td>
-					${myOrderInfo.gift_wrapping}
-					</td>
-				</TR>
-			</TBODY>
-		</TABLE>
-		
-	</DIV>
-	<div >
-	  <br><br>
-	   <h2>주문고객</h2>
-		 <table >
-		   <TBODY>
-			 <tr class="dot_line">
-				<td ><h2>이름</h2></td>
-				<td>
-				 <input  type="text" value="${orderer.member_name}" size="15" disabled />
-				</td>
-			  </tr>
-			  <tr class="dot_line">
-				<td ><h2>핸드폰</h2></td>
-				<td>
-				 <input  type="text" value="${orderer.hp1}-${orderer.hp2}-${orderer.hp3}" size="15" disabled />
-				</td>
-			  </tr>
-			  <tr class="dot_line">
-				<td ><h2>이메일</h2></td>
-				<td>
-				   <input  type="text" value="${orderer.email1}@${orderer.email2}" size="15" disabled />
-				</td>
-			  </tr>
-		   </TBODY>
-		</table>
-	</div>
-	<DIV class="clear"></DIV>
-	<br>
-	<br>
-	<br>
-	<H1>3.결제정보</H1>
-	<DIV class="detail_table">
-		<table>
-			<TBODY>
-				<TR class="dot_line">
-					<TD class="fixed_join">결제방법</TD>
-					<TD>
-					   ${myOrderInfo.pay_method }
-				    </TD>
-				</TR>
-				<TR class="dot_line">
-					<TD class="fixed_join">결제카드</TD>
-					<TD>
-					   ${myOrderInfo.card_com_name}
-				    </TD>
-				</TR>
-				<TR class="dot_line">
-					<TD class="fixed_join">할부기간</TD>
-					<TD>
-					   ${myOrderInfo.card_pay_month }
-				    </TD>
-				</TR>
-			</TBODY>
-		</table>
-	</DIV>
-</form>
-    <DIV class="clear"></DIV>
-	<br>
-	<br>
-	<br>
-	<center>
-		<br>
-		<br> 
-		<a href="${contextPath}/main/main.do"> 
-		   <IMG width="75" alt="" src="${contextPath}/resources/image/btn_shoping_continue.jpg">
-		</a>
-<DIV class="clear"></DIV>		
-	
-			
-			
-			
+  <br><br>
+  <h1>2. 배송지 정보</h1>
+  <table border="1" cellspacing="0" cellpadding="6" width="70%">
+    <tbody>
+      <tr><td>배송방법</td><td>${myOrderInfo.delivery_method}</td></tr>
+      <tr><td>받으실 분</td><td>${myOrderInfo.receiver_name}</td></tr>
+      <tr><td>휴대폰번호</td>
+          <td>${myOrderInfo.receiver_hp1}-${myOrderInfo.receiver_hp2}-${myOrderInfo.receiver_hp3}</td></tr>
+      <tr><td>유선전화(선택)</td>
+          <td>${myOrderInfo.receiver_tel1}-${myOrderInfo.receiver_tel2}-${myOrderInfo.receiver_tel3}</td></tr>
+      <tr><td>주소</td><td>${myOrderInfo.delivery_address}</td></tr>
+      <tr><td>배송 메시지</td><td>${myOrderInfo.delivery_message}</td></tr>
+      <tr><td>선물 포장</td><td>${myOrderInfo.gift_wrapping}</td></tr>
+    </tbody>
+  </table>
+
+  <br><br>
+  <h2>주문 고객 정보</h2>
+  <table border="1" cellpadding="6">
+    <tbody>
+      <tr><td>이름</td><td><input type="text" value="${orderer.member_name}" disabled></td></tr>
+      <tr><td>핸드폰</td><td><input type="text" value="${orderer.hp1}-${orderer.hp2}-${orderer.hp3}" disabled></td></tr>
+      <tr><td>이메일</td><td><input type="text" value="${orderer.email1}@${orderer.email2}" disabled></td></tr>
+    </tbody>
+  </table>
+
+  <br><br>
+  <h1>3. 결제정보</h1>
+  <table border="1" cellpadding="6">
+    <tbody>
+      <tr><td>결제방법</td><td>${myOrderInfo.pay_method}</td></tr>
+      <tr><td>결제카드</td><td>${myOrderInfo.card_com_name}</td></tr>
+      <tr><td>할부기간</td><td>${myOrderInfo.card_pay_month}</td></tr>
+    </tbody>
+  </table>
+
+  <br><br>
+  <center>
+    <a href="${contextPath}/main/main.do">
+      <img width="120" alt="쇼핑 계속하기" src="${contextPath}/resources/image/btn_shoping_continue.jpg">
+    </a>
+  </center>
+</body>

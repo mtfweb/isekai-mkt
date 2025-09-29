@@ -14,29 +14,29 @@
   <title>상품 상세보기</title>
 </head>
 <body>
-  <h2>${goodsMap.goodsVO.goods_title}</h2>
+  <h2>${goodsMap.goods.goods_title}</h2>
 
   <div>
     <p>정가:
-      <fmt:formatNumber value="${goodsMap.goodsVO.goods_price}" type="number" /> 원
+      <fmt:formatNumber value="${goodsMap.goods.goods_price}" type="number" /> 원
     </p>
     <p>판매가:
-      <fmt:formatNumber value="${goodsMap.goodsVO.goods_sales_price}" type="number" /> 원
+      <fmt:formatNumber value="${goodsMap.goods.goods_sales_price}" type="number" /> 원
     </p>
-    <p>상태: ${goodsMap.goodsVO.goods_status}</p>
-    <p>소개: ${goodsMap.goodsVO.goods_intro}</p>
+    <p>상태: ${goodsMap.goods.goods_status}</p>
+    <p>소개: ${goodsMap.goods.goods_intro}</p>
   </div>
 
   <div>
     <h3>상품 이미지</h3>
-    <c:forEach var="img" items="${goodsMap.imageList}">
-      <img src="${contextPath}/thumbnails.do?goods_id=${img.goods_id}&fileName=${img.fileName}" width="200" />
+    <c:forEach var="img" items="${goodsMap.imageFileList}">
+      <img src="${contextPath}${img.fileUrl}" width="200" />
     </c:forEach>
   </div>
 
   <div>
     <form action="${contextPath}/cart/addGoodsInCart.do" method="post">
-      <input type="hidden" name="goods_id" value="${goodsMap.goodsVO.goods_id}" />
+      <input type="hidden" name="goods_id" value="${goodsMap.goods.goods_id}" />
       <label>수량:</label>
       <input type="number" name="cart_goods_qty" value="1" min="1" />
       <input type="submit" value="장바구니 담기" />
