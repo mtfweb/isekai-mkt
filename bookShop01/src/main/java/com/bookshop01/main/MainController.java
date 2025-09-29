@@ -19,24 +19,23 @@ import com.bookshop01.goods.vo.GoodsVO;
 @Controller("mainController")
 public class MainController extends BaseController {
 
-	@Autowired
-	private GoodsService goodsService;
+    @Autowired
+    private GoodsService goodsService;
 
-	/**
-	 * 메인 화면: 상품 목록 조회 짧은 URL을 위해 "/"도 같은 핸들러로 매핑한다.
-	 */
-	@RequestMapping(value = { "/main/main.do", "/main", "/"}, method = RequestMethod.GET)
-	public ModelAndView main(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		// ViewNameInterceptor가 없거나 "/"에서 viewName을 못 찾으면 기본값 사용
-		String viewName = (String) request.getAttribute("viewName");
-		if (viewName == null || viewName.isEmpty()) {
-			viewName = "main/main";
-		}
+    // 진짜 메인 핸들러: /main.do
+    @RequestMapping(value="/main.do", method=RequestMethod.GET)
+    public ModelAndView main(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String viewName = (String) request.getAttribute("viewName");
+        if (viewName == null || viewName.isEmpty()) viewName = "main/main"; // Tiles or JSP 경로
+        Map<String, List<GoodsVO>> goodsMap = goodsService.listGoods();
+        ModelAndView mav = new ModelAndView(viewName);
+        mav.addObject("goodsMap", goodsMap);
+        return mav;
+    }
 
-		Map<String, List<GoodsVO>> goodsMap = goodsService.listGoods();
-
-		ModelAndView mav = new ModelAndView(viewName);
-		mav.addObject("goodsMap", goodsMap);
-		return mav;
-	}
+    // 예전 주소로 들어오면 새 주소로 302 리다이렉트
+    @RequestMapping(value="/main/main.do", method=RequestMethod.GET)
+    public String legacyMain() {
+        return "redirect:/main.do";
+    }
 }
